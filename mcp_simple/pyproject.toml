@@ -1,0 +1,25 @@
+[project]
+name = "mcp_simple"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "anyio>=4.13.0",
+    "colorama>=0.4.6",
+    "fastapi>=0.136.1",
+    "httpx>=0.28.1",
+    "httpx-sse>=0.4.3",
+    "langchain>=1.2.17",
+    "langchain-core>=1.3.2",
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.2.1",
+    "mcp>=1.27.0",
+    "mcp-use>=1.2.6",
+    "openai>=2.33.0",
+    "psutil>=7.2.2",
+    "pydantic>=2.13.3",
+    "pytest>=9.0.3",
+    "rich>=15.0.0",
+    "uvicorn>=0.46.0",
+]
