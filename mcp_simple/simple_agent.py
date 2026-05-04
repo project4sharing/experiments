@@ -27,8 +27,6 @@ import config
 log = logging.getLogger(__name__)
 
 
-# ── LLM factory ──────────────────────────────────────────────────────────────
-
 def build_llm(
     model: Optional[str] = None,
     temperature: float = 0.0,
@@ -45,8 +43,6 @@ def build_llm(
     )
 
 
-# ── Client factory ────────────────────────────────────────────────────────────
-
 def build_client(server_config: dict) -> MCPClient:
     """
     Build an MCPClient from a server config dict.
@@ -60,8 +56,6 @@ def build_client(server_config: dict) -> MCPClient:
     """
     return MCPClient(server_config)
 
-
-# ── Agent factory ─────────────────────────────────────────────────────────────
 
 def build_agent(
     server_config: dict,
@@ -93,7 +87,6 @@ def build_agent(
     )
 
 
-# ── One-shot task runner ──────────────────────────────────────────────────────
 
 async def run_task(
     task: str,
@@ -124,8 +117,6 @@ async def run_task(
     return result
 
 
-# ── Tool enumeration ──────────────────────────────────────────────────────────
-
 async def list_tools(server_config: dict) -> list[dict]:
     """
     Connect to an MCP server and return its tools/list result.
@@ -141,8 +132,6 @@ async def list_tools(server_config: dict) -> list[dict]:
     await client.close_session(server_name)
     return [t.model_dump() if hasattr(t, "model_dump") else t for t in tools.tools]
 
-
-# ── Direct tool call ──────────────────────────────────────────────────────────
 
 async def call_tool(
     tool_name: str,
@@ -160,8 +149,6 @@ async def call_tool(
     await client.close_session(server_name)
     return result.content
 
-
-# ── CLI smoke test ────────────────────────────────────────────────────────────
 
 async def _smoke_test():
     """Quick end-to-end check: local LLM reachable + tools listed."""

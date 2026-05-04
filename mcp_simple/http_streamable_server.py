@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 servers/http_streamable_server.py
-──────────────────────────────────
+
 MCP server using the Streamable HTTP transport (POST /mcp endpoint).
 
 This is the modern transport introduced in the MCP 2025-03-26 spec:
@@ -30,8 +30,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 log = logging.getLogger(__name__)
 
 app = FastAPI(title="MCP Streamable HTTP Server", version="1.0.0")
-
-# ── Tool definitions ─────────────────────────────────────────────────────────
 
 TOOLS = [
     {
@@ -83,8 +81,6 @@ def execute_tool(name: str, arguments: dict) -> dict:
         }
 
 
-# ── JSON-RPC helpers ─────────────────────────────────────────────────────────
-
 def ok(req_id, result) -> dict:
     # print(f"results:{result}")
     return {"jsonrpc": "2.0", "id": req_id, "result": result}
@@ -123,8 +119,6 @@ def dispatch(msg: dict) -> dict:
         return err(req_id, -32601, f"Method not found: {method}")
 
 
-# ── Streaming generator (for slow_computation demo) ─────────────────────────
-
 async def stream_computation(req_id, steps: int) -> AsyncGenerator[str, None]:
     """Yields SSE-formatted JSON-RPC progress notifications then final result."""
     for i in range(1, steps + 1):
@@ -143,8 +137,6 @@ async def stream_computation(req_id, steps: int) -> AsyncGenerator[str, None]:
     yield f"data: {json.dumps(final)}\n\n"
 
 
-# ── Routes ────────────────────────────────────────────────────────────────────
-
 @app.post("/mcp")
 async def mcp_endpoint(request: Request):
     """
@@ -158,7 +150,7 @@ async def mcp_endpoint(request: Request):
     log.info("POST /mcp  method=%s  streaming=%s",
              body.get("method"), "text/event-stream" in accept)
 
-    # ── Streaming path: slow_computation with SSE ────────────────────────
+
     if (body.get("method") == "tools/call"
             and body.get("params", {}).get("name") == "slow_computation"
             and "text/event-stream" in accept):
@@ -169,7 +161,7 @@ async def mcp_endpoint(request: Request):
             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
 
-    # ── Normal synchronous path ──────────────────────────────────────────
+
     response = dispatch(body)
     if response is None:
         return Response(status_code=204)
@@ -200,8 +192,6 @@ async def mcp_sse_channel(request: Request):
 async def health():
     return {"status": "ok", "server": "http-streamable", "timestamp": time.time()}
 
-
-# ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
