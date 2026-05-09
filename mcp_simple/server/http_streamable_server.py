@@ -104,8 +104,6 @@ def dispatch(msg: dict) -> dict:
         })
 
     elif method == "tools/list":
-        # print("TOOL_LIST called")
-        # print(f"TOOLS:{TOOLS}")
         return ok(req_id, {"tools": TOOLS})
 
     elif method == "tools/call":

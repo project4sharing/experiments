@@ -16,6 +16,7 @@ import asyncio
 import logging
 import sys
 from pathlib import Path
+import toml
 from typing import Any, Optional
 
 from langchain_openai import ChatOpenAI
@@ -26,6 +27,8 @@ import config
 
 log = logging.getLogger(__name__)
 
+conf = toml.load(f"{str(Path(__file__).parent)}/conf/mcp_simple.toml")
+print(conf["mcpServers"])
 
 def build_llm(
     model: Optional[str] = None,
@@ -34,11 +37,11 @@ def build_llm(
 ) -> ChatOpenAI:
     
     return ChatOpenAI(
-        model="LOCAL",
-        base_url="http://localhost:8080/v1",
-        api_key="NONE",
+        model=conf["MODEL"]["LOCAL_LLM_MODEL"],
+        base_url=conf["MODEL"]["LOCAL_MODEL_BASE_URL"],
+        api_key=conf["MODEL"]["LOCAL_LLM_API_KEY"],
         temperature=temperature,
-        timeout=120,
+        timeout=conf["MODEL"]["LOCAL_LLM_TIMEOUT"],
         max_retries=2,
     )
 
@@ -130,7 +133,7 @@ async def list_tools(server_config: dict) -> list[dict]:
     session = await client.create_session(server_name)
     tools = await session.list_tools()
     await client.close_session(server_name)
-    return [t.model_dump() if hasattr(t, "model_dump") else t for t in tools.tools]
+    return [t.model_dump() if hasattr(t, "model_dump") else t for t in tools]
 
 
 async def call_tool(
@@ -157,15 +160,15 @@ async def _smoke_test():
     c = Console()
 
     c.rule("[bold cyan]mcp-use client smoke test[/]")
-    c.print(f"  LLM endpoint : [yellow]{config.LOCAL_LLM_BASE_URL}[/]")
-    c.print(f"  Model        : [yellow]{config.LOCAL_LLM_MODEL}[/]")
+    c.print(f"  LLM endpoint : [yellow]{conf["MODEL"]["LOCAL_MODEL_BASE_URL"]}[/]")
+    c.print(f"  Model        : [yellow]{conf["MODEL"]["LOCAL_LLM_MODEL"]}[/]")
 
     # 1. Check LLM health
     c.print("\n[bold]1. LLM reachability[/]")
     try:
         async with httpx.AsyncClient() as hx:
             resp = await hx.get(
-                f"{config.LOCAL_LLM_BASE_URL.rstrip('/v1').rstrip('/')}/health",
+                f"{conf["MODEL"]["LOCAL_MODEL_BASE_URL"].rstrip('/v1').rstrip('/')}/health",
                 timeout=5.0,
             )
         c.print(f"  /health → [green]{resp.status_code}[/]")
@@ -178,8 +181,8 @@ async def _smoke_test():
         llm = build_llm()
         async with httpx.AsyncClient() as hx:
             resp = await hx.get(
-                f"{config.LOCAL_LLM_BASE_URL}/models",
-                headers={"Authorization": f"Bearer {config.LOCAL_LLM_API_KEY}"},
+                f"{conf["MODEL"]["LOCAL_MODEL_BASE_URL"]}/models",
+                headers={"Authorization": f"Bearer {conf["MODEL"]["LOCAL_LLM_API_KEY"]}"},
                 timeout=5.0,
             )
             models = resp.json().get("data", [])
@@ -192,7 +195,9 @@ async def _smoke_test():
     c.print("\n[bold]3. Tool listing via mcp-use (requires clean_http server on :8000)[/]")
     try:
         import config as cfg
-        tools = await list_tools(cfg.mcp_server_config("clean_http"))
+        print(f"cfg={cfg.get_server_config("clean_http")}")
+        tools = await list_tools(cfg.get_server_config("clean_http"))
+        # tools = await list_tools(conf["mcpServers"]["clean_http"])
         for t in tools:
             c.print(f"  • [cyan]{t['name']}[/] — {t.get('description','')[:60]}")
         c.print(f"  [green]✓ {len(tools)} tool(s) found[/]")
