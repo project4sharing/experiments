@@ -1,14 +1,29 @@
 [MODEL]
-LOCAL_MODEL_BASE_URL = "http://127.0.0.1:8000/v1"
+LOCAL_MODEL_BASE_URL = "http://127.0.0.1:8080/v1"
 LOCAL_LLM_MODEL     = "local-model"
 LOCAL_LLM_API_KEY   = "not-needed"
 LOCAL_LLM_TIMEOUT   = 120
 
+[CONFIG.OFFICE]
+CA_PATH = ""
+PROXY = "http://localhost:9000"
+
+[CONFIG.NOT_OFFICE]
+
+
+
 [mcpServers.clean_http]
-url = "http://localhost:8000/mcp"
-#auth = "None"
-[mcpServers.clean_sse]
 url = "http://localhost:8001/mcp"
 auth = "None"
-
+#[mcpServers.clean_sse]
+#url = "http://localhost:8001/mcp"
+#auth = "None"
+[mcpServers.server_filesystem]
+command = "npx"
+args = [
+    "-y",
+    "@modelcontextprotocol/server-filesystem",
+    "C:/Users/petelam/Downloads"
+]
+env = []
     
