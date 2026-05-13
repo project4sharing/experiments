@@ -17,8 +17,7 @@ async def main():
     mcp_config = {
         "mcpServers": {
             "weather": {
-                "command": "uv",
-                "args": ["run", "./server/stdio_weather_server.py"]
+                "url": "http://127.0.0.1:8001/mcp"
             },
             "knowledge": {
                 "command": "uv",
