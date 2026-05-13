@@ -16,13 +16,13 @@ async def main():
     # DEFINE MULTIPLE SERVERS
     mcp_config = {
         "mcpServers": {
-            "weather": {
+            "knowledge": {
                 "url": "http://127.0.0.1:8001/mcp",
                 "auth": None
             },
-            "knowledge": {
+            "weather": {
                 "command": "uv",
-                "args": ["run", "./server/http_knowledge_server.py"]
+                "args": ["run", "./server/stdio_weather_server.py"]
             }
         }
     }
