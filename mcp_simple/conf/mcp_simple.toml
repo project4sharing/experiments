@@ -11,7 +11,7 @@ PROXY = "http://localhost:9000"
 [CONFIG.NOT_OFFICE]
 
 
-
+# MCP Servers List
 [mcpServers.knowledge]
 url = "http://localhost:8001/mcp"
 auth = "None"
@@ -22,16 +22,5 @@ args = [
     "run",
     "./server/stdio_weather_server.py"
 ]
-
-#[mcpServers.clean_sse]
-#url = "http://localhost:8001/mcp"
-#auth = "None"
-#[mcpServers.server_filesystem]
-#command = "npx"
-#args = [
-#    "-y",
-#    "@modelcontextprotocol/server-filesystem",
-#    "C:/Users/petelam/Downloads"
-#]
-env = []
+env = {}
     

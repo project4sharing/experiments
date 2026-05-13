@@ -11,7 +11,6 @@ conf = toml.load(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml")
 
 cfg = conf.get("OFFICE" if os.environ.get('HTTP_PROXY') else "NOT_OFFICE", {})
 
-
 # Initialize FastMCP
 mcp = FastMCP("KnowledgeBase")
 

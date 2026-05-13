@@ -4,14 +4,15 @@ import mcp_use
 from mcp_use import MCPAgent, MCPClient
 from langchain_openai import ChatOpenAI
 from pathlib import Path
-import toml
+import tomllib
 from typing import Any, Optional
 
 # Show the handshake for both servers
 mcp_use.set_debug(2)
 
 async def main():
-    conf = toml.load(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml")
+    with open(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml", "rb") as f:
+        conf = tomllib.load(f)
 
     llm = ChatOpenAI(
         base_url=conf["MODEL"]["LOCAL_LLM_BASE_URL"],
@@ -19,25 +20,12 @@ async def main():
         model=conf["MODEL"]["LOCAL_LLM_MODEL"]
     )
 
-    # DEFINE MULTIPLE SERVERS
-    mcp_config = {
-        "mcpServers": {
-            "knowledge": {
-                "url": "http://127.0.0.1:8001/mcp",
-                "auth": None
-            },
-            "weather": {
-                "command": "uv",
-                "args": ["run", "./server/stdio_weather_server.py"]
-            }
-        }
-    }
-
+    print({'mcpServers': conf['mcpServers']})
     print("\n--- INITIALIZING MULTI-SERVER CLIENT ---")
-    client = MCPClient(config=mcp_config)
+    client = MCPClient(config={'mcpServers': conf['mcpServers']})
 
     print("\n--- INITIALIZING AGENT ---")
-    agent = MCPAgent(llm=llm, client=client)
+    agent = MCPAgent(llm=llm, client=client, verbose=True)
 
     # A complex problem requiring information from TWO different MCP servers
     query = (
