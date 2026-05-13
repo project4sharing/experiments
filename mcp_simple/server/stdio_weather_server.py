@@ -1,6 +1,12 @@
 import httpx
-import sys
+import logging
 from mcp.server.fastmcp import FastMCP
+import os
+from pathlib import Path
+import toml
+
+log = logging.getLogger(__name__)
+conf = toml.load(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml")
 
 # Initialize the server
 mcp = FastMCP("WeatherService")
@@ -13,7 +19,7 @@ async def get_weather(location: str) -> str:
     url = f"https://wttr.in/{query}?format=j1"
     
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(proxy="http://localhost:9000" if os.environ.get('HTTP_PROXY') else None, verify=False) as client:
             response = await client.get(url, timeout=10.0)
             response.raise_for_status()
             data = response.json()

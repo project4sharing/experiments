@@ -27,37 +27,12 @@ import config
 log = logging.getLogger(__name__)
 
 
-# ── LLM factory ──────────────────────────────────────────────────────────────
 
-def build_llm(
-    model: Optional[str] = None,
-    temperature: float = 0.0,
-    timeout: Optional[int] = None,
-) -> ChatOpenAI:
-    """
-    Returns a ChatOpenAI instance pointed at your local LLM.
-
-    Works with any OpenAI-compatible server:
-      - Ollama        (ollama serve          → default :11434, or proxy to :8080)
-      - LM Studio     (Local Server tab      → :8080)
-      - llama.cpp     (llama-server          → :8080)
-      - vLLM          (python -m vllm.entrypoints.openai.api_server → :8080)
-      - Jan.ai        (API Server settings   → :8080)
-      - text-gen-webui (--api --listen-port 8080)
-    """
-    return ChatOpenAI(
-        model=model or config.LOCAL_LLM_MODEL,
-        base_url=config.LOCAL_LLM_BASE_URL,
-        api_key=config.LOCAL_LLM_API_KEY,
-        temperature=temperature,
-        timeout=timeout or config.LOCAL_LLM_TIMEOUT,
-        max_retries=2,
-    )
 
 
 # ── Client factory ────────────────────────────────────────────────────────────
 
-def build_client(server_config: dict) -> MCPClient:
+def get_client(server_config: dict) -> MCPClient:
     """
     Build an MCPClient from a server config dict.
 
@@ -73,35 +48,6 @@ def build_client(server_config: dict) -> MCPClient:
 
 
 # ── Agent factory ─────────────────────────────────────────────────────────────
-
-def build_agent(
-    server_config: dict,
-    system_prompt: Optional[str] = None,
-    max_steps: int = 10,
-    disallowed_tools: Optional[list[str]] = None,
-    verbose: bool = False,
-) -> MCPAgent:
-    """
-    Build an MCPAgent wired to your local LLM.
-
-    Args:
-        server_config:     mcpServers dict (see config.mcp_server_config)
-        system_prompt:     Optional override for the agent system prompt
-        max_steps:         Max tool call iterations before giving up
-        disallowed_tools:  Tool names the agent must never call
-        verbose:           Print LangChain chain trace
-    """
-    llm    = build_llm()
-    client = build_client(server_config)
-    return MCPAgent(
-        llm=llm,
-        client=client,
-        system_prompt=system_prompt,
-        max_steps=max_steps,
-        disallowed_tools=disallowed_tools or [],
-        verbose=verbose,
-        memory_enabled=True,
-    )
 
 
 # ── One-shot task runner ──────────────────────────────────────────────────────
