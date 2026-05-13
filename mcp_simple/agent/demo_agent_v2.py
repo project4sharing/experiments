@@ -17,7 +17,8 @@ async def main():
     mcp_config = {
         "mcpServers": {
             "weather": {
-                "url": "http://127.0.0.1:8001/mcp"
+                "url": "http://127.0.0.1:8001/mcp",
+                "auth": None
             },
             "knowledge": {
                 "command": "uv",
