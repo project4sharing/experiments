@@ -1,16 +1,22 @@
 import asyncio
+import logging
 import mcp_use
 from mcp_use import MCPAgent, MCPClient
 from langchain_openai import ChatOpenAI
+from pathlib import Path
+import toml
+from typing import Any, Optional
 
 # Show the handshake for both servers
 mcp_use.set_debug(2)
 
 async def main():
+    conf = toml.load(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml")
+
     llm = ChatOpenAI(
-        base_url="http://localhost:8080/v1",
-        api_key="local-llm",
-        model="local-model"
+        base_url=conf["MODEL"]["LOCAL_MODEL_BASE_URL"],
+        api_key=conf["MODEL"]["LOCAL_MODEL_API_KEY"],
+        model=conf["MODEL"]["LOCAL_MODEL"]
     )
 
     # DEFINE MULTIPLE SERVERS
