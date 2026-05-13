@@ -14,9 +14,9 @@ async def main():
     conf = toml.load(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml")
 
     llm = ChatOpenAI(
-        base_url=conf["MODEL"]["LOCAL_MODEL_BASE_URL"],
-        api_key=conf["MODEL"]["LOCAL_MODEL_API_KEY"],
-        model=conf["MODEL"]["LOCAL_MODEL"]
+        base_url=conf["MODEL"]["LOCAL_LLM_BASE_URL"],
+        api_key=conf["MODEL"]["LOCAL_LLM_API_KEY"],
+        model=conf["MODEL"]["LOCAL_LLM_MODEL"]
     )
 
     # DEFINE MULTIPLE SERVERS
