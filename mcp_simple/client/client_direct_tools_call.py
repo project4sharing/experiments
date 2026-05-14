@@ -1,21 +1,9 @@
-"""
-clients/mcp_use_client.py
-──────────────────────────
-Thin wrapper around mcp-use that wires your local LLM (port 8080)
-to any MCP server configuration.
-
-Provides:
-  • build_llm()         — ChatOpenAI pointed at localhost:8080
-  • build_agent()       — MCPAgent ready to run tasks
-  • run_task()          — one-shot task execution
-  • list_tools()        — enumerate tools exposed by a server
-  • call_tool()         — call a specific tool and return raw result
-"""
-
 import asyncio
 import logging
+import mcp_use
 import sys
 from pathlib import Path
+import tomllib
 from typing import Any, Optional
 
 from langchain_openai import ChatOpenAI
@@ -26,28 +14,26 @@ import config
 
 log = logging.getLogger(__name__)
 
+mcp_use.set_debug(2)
+
+async def main():
+    with open(f"{str(Path(__file__).parent.parent)}/conf/mcp_simple.toml", "rb") as f:
+        conf = tomllib.load(f)
+
+    server_config = {'mcpServers': conf['mcpServers']}
+
+    client = MCPClient(config=server_config)
+    server_name = next(iter(server_config.get("mcpServers", {})), None)
+    print(f"Servers: {server_name}")
+    server_name = "weather"
+
+    session = await client.create_session(server_name)
+    tools = await session.list_tools()
+    print(f"Inside list_tools, tools={tools}")
+    await client.close_session(server_name)
+    return [t.model_dump() if hasattr(t, "model_dump") else t for t in tools]
 
 
-
-
-# ── Client factory ────────────────────────────────────────────────────────────
-
-def get_client(server_config: dict) -> MCPClient:
-    """
-    Build an MCPClient from a server config dict.
-
-    Example:
-        client = build_client({
-            "mcpServers": {
-                "my-server": {"url": "http://localhost:8000/mcp"}
-            }
-        })
-    """
-    # print(f"INside build_client()::{server_config}")
-    return MCPClient(server_config, verify=False)
-
-
-# ── Agent factory ─────────────────────────────────────────────────────────────
 
 
 # ── One-shot task runner ──────────────────────────────────────────────────────
@@ -116,7 +102,7 @@ async def call_tool(
     client = build_client(server_config)
     server_name = next(iter(server_config.get("mcpServers", {})))
     session = await client.create_session(server_name)
-    result = await session.call_tool(tool_name, arguments)
+    # result = await session.call_tool(tool_name, arguments)
     await client.close_session(server_name)
     return result.content
 
@@ -188,4 +174,4 @@ async def _smoke_test():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
-    asyncio.run(_smoke_test())
+    asyncio.run(main())
