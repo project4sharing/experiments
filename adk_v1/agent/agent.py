@@ -20,4 +20,4 @@ root_agent = LlmAgent(
     tools=[get_current_time]
 )
 
-## Command to run: uv run adk run agent
+## Command to run (in adk_v1 folder): uv run adk run agent
