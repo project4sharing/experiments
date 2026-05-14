@@ -1,5 +1,8 @@
 from google.adk.agents import LlmAgent
 from google.adk.models.lite_llm import LiteLlm
+import litellm
+
+litellm.debug = True
 
 # Define the local model configuration
 local_model = LiteLlm(
