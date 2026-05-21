@@ -1,7 +1,7 @@
 [project]
 name = "mcp_simple"
 version = "0.1.0"
-description = "Simple MCP agent, client and server"
+description = "Simple MCP agent, client and server using mcp-host python package"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
