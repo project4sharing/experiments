@@ -1,6 +1,6 @@
 import httpx
 import logging
-from fastmcp import FastMCP
+from mcp.server import FastMCP
 import os
 from pathlib import Path
 import toml
@@ -51,4 +51,4 @@ async def get_wikipedia_summary(topic: str) -> str:
 
 if __name__ == "__main__":
     # This turns the server into an HTTP endpoint
-    mcp.run(host="0.0.0.0",transport="http", port=8001)
+    mcp.run(host="localhost",transport="streamable-http", port=8001)

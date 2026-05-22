@@ -8,13 +8,12 @@ LOCAL_LLM_TIMEOUT   = 120
 CA_PATH = ""
 PROXY = "http://localhost:9000"
 
-[CONFIG.NOT_OFFICE]
-
 
 # MCP Servers List
 [mcpServers.knowledge]
 url = "http://localhost:8001/mcp"
 auth = "None"
+timeout = 5
 
 [mcpServers.weather]
 command = "uv"
